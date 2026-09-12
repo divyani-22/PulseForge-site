@@ -17,7 +17,7 @@ const getInitialBase = () => {
       }
     }
   } catch {}
-  return 'http://172.20.10.4:5000/api';
+  return 'http://192.168.1.9:5000/api';
 };
 
 let currentBaseUrl = getInitialBase();
