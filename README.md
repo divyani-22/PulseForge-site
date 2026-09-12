@@ -22,13 +22,6 @@
 
 </div>
 
-<br />
-
-> 🌐 **Live Website**: [https://pulseforge-divyani22.vercel.app](https://pulseforge-divyani22.vercel.app) (Alternative: [https://frontend-divyani22.vercel.app](https://frontend-divyani22.vercel.app))
->
-> 🚀 **The Next Generation of Proactive Healthcare**: PulseForge is an end-to-end intelligent IoT and clinical intelligence platform. It seamlessly ingests continuous physiological telemetry (Heart Rate, SpO2, Temperature), computes early-warning hemodynamic scores (MEWS/NEWS2, Shock Index, MAP), executes real-time multi-class Machine Learning inference across 12 clinical scenarios, and equips users and clinicians with context-grounded AI guidance powered by Google Gemini.
-
----
 
 ## 📑 Table of Contents
 - [✨ Key Features](#-key-features)
