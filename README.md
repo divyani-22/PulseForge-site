@@ -1,6 +1,4 @@
 <div align="center">
-  <img src="assets/hero_banner.jpg" alt="PulseForge Banner" width="100%" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
-
   # ⚡ PulseForge — Smart User Monitoring System
   
   **Real-Time Vitals Telemetry • Multi-Class ML Risk Stratification • Context-Aware Gemini AI Assistant**
