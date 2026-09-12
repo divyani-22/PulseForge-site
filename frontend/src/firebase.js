@@ -18,7 +18,7 @@ const db = getDatabase(app)
 /**
  * Listen to real-time vitals from ESP32 for a given device/patient.
  * Firebase path: patients/{deviceId}/vitals
- * @param {string} deviceId - e.g. "PATIENT_001"
+ * @param {string} deviceId - e.g. "ESP32_DEVICE_ID"
  * @param {function} callback - called with array of vitals readings
  * @returns {function} unsubscribe function
  */

@@ -41,7 +41,7 @@ export default function Dashboard() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this patient and all their records?')) return
+    if (!confirm('Delete this user and all their records?')) return
     try {
       await api.deletePatient(id)
       setPatients(pts => pts.filter(p => p.id !== id))
@@ -85,7 +85,7 @@ export default function Dashboard() {
             </div>
             <div>
               <div className="text-2xl font-bold">{patients.length}</div>
-              <div className="text-sm text-gray-500">Registered Patients</div>
+              <div className="text-sm text-gray-500">Registered Users</div>
             </div>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Add patient */}
+      {/* Add user */}
       {showForm ? (
         <PatientForm
           onCreated={(p) => { setPatients(pts => [p, ...pts]); setShowForm(false) }}
@@ -138,18 +138,18 @@ export default function Dashboard() {
       ) : (
         <button onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm">
-          <Plus className="w-4 h-4" /> Register New Patient
+          <Plus className="w-4 h-4" /> Register New User
         </button>
       )}
 
-      {/* Patient list */}
+      {/* User list */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold">Patients</h2>
+          <h2 className="text-lg font-semibold">Users</h2>
         </div>
         {patients.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No patients registered yet. Click "Register New Patient" to get started.
+            No users registered yet. Click "Register New User" to get started.
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -158,7 +158,7 @@ export default function Dashboard() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <Link to={`/patient/${p.id}`} className="font-medium text-blue-700 hover:text-blue-800">
-                      {p.name}
+                      User ({p.id})
                     </Link>
                     {statusBadge(p.latest_vitals)}
                   </div>
@@ -172,7 +172,7 @@ export default function Dashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleDelete(p.id)} title="Delete patient"
+                  <button onClick={() => handleDelete(p.id)} title="Delete user"
                     className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>

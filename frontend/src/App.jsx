@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './auth/AuthContext'
 import Navbar from './components/Navbar'
 import ChatLauncher from './components/ChatLauncher'
+import ErrorBoundary from './components/ErrorBoundary'
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
@@ -18,7 +19,7 @@ function ProtectedRoute({ children }) {
 
 function RoleDashboard() {
   const { user } = useAuth()
-  if (user.role === 'doctor') return <DoctorDashboard />
+  if (user?.role === 'doctor') return <DoctorDashboard />
   return <PatientDashboard />
 }
 
@@ -27,10 +28,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <ErrorBoundary>
+        <Navbar />
+      </ErrorBoundary>
+      <ErrorBoundary>
         <ChatLauncher />
-      {user ? (
-        <main className="max-w-7xl mx-auto px-4 py-6">
+      </ErrorBoundary>
+      <ErrorBoundary message="Unable to load page view. Please refresh or try again.">
+        {user ? (
+        <main className="max-w-7xl mx-auto px-4 pt-6 pb-28">
           <Routes>
             <Route path="/" element={<RoleDashboard />} />
             <Route path="/patient/:id" element={<PatientDetail />} />
@@ -46,6 +52,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       )}
+      </ErrorBoundary>
     </div>
   )
 }

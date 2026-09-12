@@ -100,18 +100,18 @@ export default function LiveMonitor({ patientId, deviceId, onNewReading }) {
           <h3 className="text-lg font-semibold">Link ESP32 Device</h3>
         </div>
         <p className="text-sm text-gray-500 mb-4">
-          Enter the Device ID configured in your Arduino sketch to link this patient with their hardware.
+          Enter the Device ID configured in your Arduino sketch to link this user with their hardware.
         </p>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 max-w-xl">
           <input
-            placeholder="e.g. PATIENT_001"
+            placeholder="Enter hardware device ID"
             className="flex-1 border border-gray-300 rounded-lg px-4 py-2 font-mono focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none"
             value={deviceInput}
             onChange={e => setDeviceInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleLinkDevice()}
           />
           <button onClick={handleLinkDevice} disabled={linking || !deviceInput.trim()}
-            className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 font-medium flex items-center gap-1.5">
+            className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 font-medium flex items-center justify-center gap-1.5 shrink-0">
             {linking ? <Loader className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />} Link
           </button>
         </div>

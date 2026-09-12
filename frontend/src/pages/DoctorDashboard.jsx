@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { useI18n } from '../context/I18nContext'
 import { api } from '../api'
 import PatientForm from '../components/PatientForm'
 import { Users, Activity, Brain, Plus, Trash2, ChevronRight, Stethoscope, Copy } from 'lucide-react'
 
 export default function DoctorDashboard() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const [patients, setPatients] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [modelStatus, setModelStatus] = useState(null)
@@ -47,7 +49,7 @@ export default function DoctorDashboard() {
   }
 
   const handleDelete = async (id) => {
-    if (!confirm('Delete this patient and all their records?')) return
+    if (!confirm('Delete this user and all their records?')) return
     try {
       await api.deletePatient(id)
       setPatients(pts => pts.filter(p => p.id !== id))
@@ -82,7 +84,7 @@ export default function DoctorDashboard() {
     )
   }
 
-  if (loading) return <div className="text-center py-20 text-gray-500">Loading...</div>
+  if (loading) return <div className="text-center py-20 text-gray-500">{t('loading', 'Loading...')}</div>
 
   return (
     <div className="space-y-6">
@@ -91,7 +93,7 @@ export default function DoctorDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm opacity-80">
-              <Stethoscope className="w-4 h-4" /> Doctor Dashboard
+              <Stethoscope className="w-4 h-4" /> {t('clinicalDashboard', 'Doctor Dashboard')}
             </div>
             <h1 className="text-2xl font-bold mt-1">Dr. {user.name}</h1>
             {user.specialization && <div className="text-sm opacity-80 mt-0.5">{user.specialization}</div>}
@@ -106,7 +108,7 @@ export default function DoctorDashboard() {
               </button>
             </div>
             {copied && <div className="text-xs mt-1 opacity-80">Copied!</div>}
-            <div className="text-xs opacity-70 mt-1">Share with patients to register under you</div>
+            <div className="text-xs opacity-70 mt-1">Share with users to register under you</div>
           </div>
         </div>
       </div>
@@ -120,7 +122,7 @@ export default function DoctorDashboard() {
             </div>
             <div>
               <div className="text-2xl font-bold">{patients.length}</div>
-              <div className="text-sm text-gray-500">My Patients</div>
+              <div className="text-sm text-gray-500">{t('totalPatients', 'My Users')}</div>
             </div>
           </div>
         </div>
@@ -133,7 +135,7 @@ export default function DoctorDashboard() {
               <div className="text-2xl font-bold">
                 {patients.reduce((sum, p) => sum + (p.readings_count || 0), 0)}
               </div>
-              <div className="text-sm text-gray-500">Total Readings</div>
+              <div className="text-sm text-gray-500">{t('activeMonitoring', 'Total Readings')}</div>
             </div>
           </div>
         </div>
@@ -171,18 +173,18 @@ export default function DoctorDashboard() {
       ) : (
         <button onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium shadow-sm">
-          <Plus className="w-4 h-4" /> Add New Patient
+          <Plus className="w-4 h-4" /> {t('registerNewPatient', 'Add New User')}
         </button>
       )}
 
       {/* Patient list */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold">My Patients</h2>
+          <h2 className="text-lg font-semibold">{t('patientDirectory', 'My Users')}</h2>
         </div>
         {patients.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No patients yet. Add a patient or share your Doctor Code ({user.id}) with patients to register under you.
+            {t('noPatientsFound', 'No users yet.')} Share your Doctor Code ({user.id}) with users to register under you.
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -191,12 +193,12 @@ export default function DoctorDashboard() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <Link to={`/patient/${p.id}`} className="font-medium text-blue-700 hover:text-blue-800">
-                      {p.name}
+                      User ({p.id})
                     </Link>
                     {statusBadge(p.latest_vitals)}
                   </div>
                   <div className="text-sm text-gray-500 mt-0.5">
-                    {p.age}y {p.gender === 'M' ? 'Male' : 'Female'} | BMI: {p.bmi} | {p.age_group?.replace(/_/g, ' ')}
+                    {p.age}y {p.gender === 'M' ? t('male', 'Male') : t('female', 'Female')} | BMI: {p.bmi} | {p.age_group?.replace(/_/g, ' ')}
                     {p.comorbidities && ` | ${p.comorbidities}`}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5">
@@ -205,7 +207,7 @@ export default function DoctorDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleDelete(p.id)} title="Delete patient"
+                  <button onClick={() => handleDelete(p.id)} title="Delete user"
                     className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors">
                     <Trash2 className="w-4 h-4" />
                   </button>

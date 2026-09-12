@@ -5,8 +5,7 @@ import VitalsChart from '../components/VitalsChart'
 import AutoMonitor from '../components/AutoMonitor'
 import LiveMonitor from '../components/LiveMonitor'
 import WifiManager from '../components/WifiManager'
-import AIChat from '../components/AIChat'
-import { ArrowLeft, FileText, TrendingUp, User, HeartPulse, Radio, MessageCircle } from 'lucide-react'
+import { ArrowLeft, FileText, TrendingUp, User, HeartPulse, Radio } from 'lucide-react'
 
 export default function PatientDetail() {
   const { id } = useParams()
@@ -37,8 +36,8 @@ export default function PatientDetail() {
 
   useEffect(() => { loadPatient() }, [loadPatient])
 
-  if (loading) return <div className="text-center py-20 text-gray-500">Loading patient data...</div>
-  if (!patient) return <div className="text-center py-20 text-red-500">Patient not found</div>
+  if (loading) return <div className="text-center py-20 text-gray-500">Loading user data...</div>
+  if (!patient) return <div className="text-center py-20 text-red-500">User not found</div>
 
   return (
     <div className="space-y-6">
@@ -50,7 +49,7 @@ export default function PatientDetail() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <User className="w-6 h-6 text-blue-600" />
-            {patient.name}
+            User {patient.id ? `(${patient.id})` : ''}
           </h1>
           <div className="text-sm text-gray-500">
             {patient.age}y {patient.gender === 'M' ? 'Male' : 'Female'} | BMI: {patient.bmi} ({patient.age_group?.replace(/_/g, ' ')})
@@ -101,7 +100,6 @@ export default function PatientDetail() {
           { key: 'live', label: 'Live Device', icon: Radio },
           { key: 'continuous', label: 'Continuous Monitoring', icon: HeartPulse },
           { key: 'trends', label: 'Trends', icon: TrendingUp },
-          { key: 'assistant', label: 'Assistant', icon: MessageCircle },
         ].map(({ key, label, icon: Icon }) => (
           <button key={key} onClick={() => setTab(key)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -160,10 +158,6 @@ export default function PatientDetail() {
             </div>
           )}
         </div>
-      )}
-
-      {tab === 'assistant' && (
-        <AIChat patientId={id} />
       )}
     </div>
   )

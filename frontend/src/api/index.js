@@ -1,7 +1,26 @@
-const BASE = 'http://localhost:5000/api';
+function getBase() {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('hmd_api_url');
+    if (saved && saved.trim()) {
+      return saved.trim().replace(/\/+$/, '');
+    }
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+    }
+    const host = window.location.hostname;
+    if (host && host !== 'localhost' && host !== '127.0.0.1') {
+      if (host.includes('vercel.app')) {
+        return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+      }
+      return `http://${host}:5000/api`;
+    }
+  }
+  return import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+}
 
 async function request(path, options = {}) {
-  const res = await fetch(`${BASE}${path}`, {
+  const base = getBase();
+  const res = await fetch(`${base}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
@@ -39,8 +58,8 @@ export const api = {
   getTrends: (patientId) => request(`/patients/${patientId}/trends`),
 
   // Chat
-  sendChatMessage: (patientId, message, lang, history) => 
-    request('/chat', { method: 'POST', body: JSON.stringify({ patient_id: patientId, message, lang, history }) }),
+  sendChatMessage: (patientId, message, lang, history, vitals) => 
+    request('/chat', { method: 'POST', body: JSON.stringify({ patient_id: patientId, message, lang, history, vitals }) }),
 
   // Reports
   getReport: (patientId) => request(`/patients/${patientId}/report`),
@@ -51,4 +70,8 @@ export const api = {
 
   // Dataset
   datasetStats: () => request('/dataset/stats'),
+
+  // Settings
+  getSettings: () => request('/settings'),
+  updateSettings: (data) => request('/settings', { method: 'POST', body: JSON.stringify(data) }),
 };

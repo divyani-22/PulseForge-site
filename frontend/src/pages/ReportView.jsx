@@ -20,7 +20,7 @@ export default function ReportView() {
   if (error) return (
     <div className="text-center py-20">
       <div className="text-red-500 mb-4">{error}</div>
-      <Link to={`/patient/${id}`} className="text-teal-600 hover:underline">Back to patient</Link>
+      <Link to={`/patient/${id}`} className="text-teal-600 hover:underline">Back to user</Link>
     </div>
   )
   if (!report) return null
@@ -73,14 +73,14 @@ export default function ReportView() {
         </button>
       </div>
 
-      {/* Patient Info */}
+      {/* User Info */}
       <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-teal-600" /> Patient Information
+          <Shield className="w-5 h-5 text-teal-600" /> User Information
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <Info label="Name" value={patient.name} />
-          <Info label="Patient ID" value={patient.id} />
+          <Info label="User" value={`User (${patient.id || id})`} />
+          <Info label="User ID" value={patient.id} />
           <Info label="Age" value={`${patient.age}y (${patient.age_group?.replace(/_/g, ' ')})`} />
           <Info label="Gender" value={patient.gender === 'M' ? 'Male' : 'Female'} />
           <Info label="BMI" value={patient.bmi} />

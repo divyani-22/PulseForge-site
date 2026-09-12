@@ -24,9 +24,9 @@ export default function ChatLauncher() {
 
       {/* Drawer */}
       {open && (
-        <div className="fixed bottom-0 right-0 z-40 w-96 h-[80vh] bg-white border-t border-l border-gray-200 shadow-xl rounded-tl-lg overflow-hidden">
+        <div className="fixed bottom-0 right-0 sm:bottom-4 sm:right-4 z-50 w-96 max-w-[calc(100vw-2rem)] h-[75vh] max-h-[600px] bg-white border border-gray-200 shadow-2xl rounded-t-2xl sm:rounded-2xl overflow-hidden">
           <AIChat 
-            patientId={user.role === 'patient' ? user.patient_link_id : null} 
+            patientId={user.role === 'patient' ? (user.patient_link_id || user.id) : null} 
             onClose={() => setOpen(false)} 
           />
         </div>

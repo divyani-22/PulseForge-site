@@ -26,7 +26,7 @@ export default function Home() {
                 <span className="block text-cyan-200">Monitoring System</span>
               </h1>
               <p className="text-lg text-teal-100 mt-6 max-w-lg leading-relaxed">
-                Real-time patient vital monitoring with AI-powered clinical predictions.
+                Real-time user vital monitoring with AI-powered clinical predictions.
                 Track heart rate, SpO2, and temperature with instant health assessments
                 powered by machine learning.
               </p>
@@ -47,7 +47,7 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-red-400" />
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="text-white/60 text-xs ml-2">Live Patient Monitor</span>
+                  <span className="text-white/60 text-xs ml-2">Live User Monitor</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <div className="bg-white/10 rounded-xl p-4 text-center">
@@ -89,11 +89,11 @@ export default function Home() {
         <div className="text-center mb-14">
           <span className="text-teal-600 font-semibold text-sm uppercase tracking-wider">About The Platform</span>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-3">
-            Intelligent Health Monitoring<br />for Better Patient Outcomes
+            Intelligent Health Monitoring<br />for Better User Outcomes
           </h2>
           <p className="text-gray-500 mt-4 max-w-2xl mx-auto">
             Our system combines IoT wearable sensors with advanced machine learning to provide
-            real-time clinical decision support for healthcare professionals and patients.
+            real-time clinical decision support for healthcare professionals and users.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-8">
@@ -134,7 +134,7 @@ export default function Home() {
           </div>
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '01', icon: Wifi, title: 'Sensor Capture', desc: 'MAX30102 and LM35 sensors read heart rate, SpO2, and temperature from the patient.' },
+              { step: '01', icon: Wifi, title: 'Sensor Capture', desc: 'MAX30102 and LM35 sensors read heart rate, SpO2, and temperature from the user.' },
               { step: '02', icon: Zap, title: 'Data Transmission', desc: 'ESP32-S3 sends readings to Firebase in real-time over WiFi every 10 seconds.' },
               { step: '03', icon: Brain, title: 'AI Analysis', desc: 'ML model computes 8 derived parameters (Shock Index, ODI, MEWS, MAP, STRS, RPP, RR Proxy, BSA) and predicts from 12 clinical scenarios.' },
               { step: '04', icon: FileText, title: 'Clinical Report', desc: 'Risk scoring (0-100), clinical protocols, vital-sign guidance, and trend analysis are generated instantly.' },
@@ -155,11 +155,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Features for Doctors & Patients ── */}
+      {/* ── Features for Doctors & Users ── */}
       <section id="features" className="max-w-7xl mx-auto px-4 py-20 scroll-mt-20">
         <div className="text-center mb-14">
           <span className="text-teal-600 font-semibold text-sm uppercase tracking-wider">Features</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-3">Built for Healthcare Professionals & Patients</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mt-3">Built for Healthcare Professionals & Users</h2>
         </div>
         <div className="grid md:grid-cols-2 gap-10">
           {/* Doctor features */}
@@ -170,14 +170,14 @@ export default function Home() {
             </div>
             <ul className="space-y-4">
               {[
-                'Dashboard with all your patients at a glance',
+                'Dashboard with all your users at a glance',
                 'Real-time vital monitoring with live device feeds',
                 'AI prediction with 8 derived parameters (SI, ODI, MEWS, MAP, STRS, RPP, RR, BSA)',
                 'MEWS scoring + composite risk assessment (0-100)',
                 'SIRS / Sepsis automated screening',
                 'Continuous monitoring with trend detection',
                 'Professional health reports with clinical recommendations',
-                'Patient deterioration pattern alerts',
+                'User deterioration pattern alerts',
               ].map((f, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <CheckCircle className="w-5 h-5 text-cyan-200 shrink-0 mt-0.5" />
@@ -186,11 +186,11 @@ export default function Home() {
               ))}
             </ul>
           </div>
-          {/* Patient features */}
+          {/* User features */}
           <div className="bg-white border-2 border-gray-100 rounded-2xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <Shield className="w-8 h-8 text-emerald-600" />
-              <h3 className="text-2xl font-bold text-slate-800">For Patients</h3>
+              <h3 className="text-2xl font-bold text-slate-800">For Users</h3>
             </div>
             <ul className="space-y-4">
               {[
@@ -270,10 +270,10 @@ export default function Home() {
       <section className="bg-gradient-to-r from-teal-700 to-cyan-600 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white">
-            Ready to Transform Patient Monitoring?
+            Ready to Transform User Health Monitoring?
           </h2>
           <p className="text-teal-100 mt-4 text-lg max-w-2xl mx-auto">
-            Join as a doctor to manage your patients, or register as a patient to track your health in real-time.
+            Join as a doctor to manage your users, or register as a user to track your health in real-time.
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-8">
             <Link to="/register"
@@ -295,10 +295,10 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 text-xl font-bold text-white mb-4">
                 <Activity className="w-6 h-6 text-teal-400" />
-                HealthMonitor
+                PulseForge
               </div>
               <p className="text-sm leading-relaxed">
-                AI-powered smart portable patient monitoring system using MAX30102 and LM35 sensors
+                AI-powered smart portable user monitoring system using MAX30102 and LM35 sensors
                 for real-time health assessment and clinical decision support.
               </p>
             </div>
@@ -330,7 +330,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm">
-            <p>Smart Portable Patient Monitoring Device | AI-Powered Clinical Decision Support System</p>
+            <p>Smart Portable User Monitoring Device | AI-Powered Clinical Decision Support System</p>
           </div>
         </div>
       </footer>

@@ -8,6 +8,15 @@ import sqlite3
 import json
 import hashlib
 from datetime import datetime
+import socket
+import requests
+
+# Prevent Windows IPv6 DNS resolution timeouts
+try:
+    import urllib3.util.connection as urllib3_cn
+    urllib3_cn.allowed_gai_family = lambda: socket.AF_INET
+except Exception:
+    pass
 
 import traceback
 from google import genai
@@ -119,6 +128,12 @@ def init_db():
         db.execute("ALTER TABLE patients ADD COLUMN device_id TEXT DEFAULT ''")
     except sqlite3.OperationalError:
         pass
+    db.execute("""
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    """)
     db.commit()
     db.close()
 
@@ -636,28 +651,37 @@ def chat():
         patient_id = data.get("patient_id")
         lang = data.get("lang", "en")
         frontend_history = data.get("history", [])
+        vitals_input = data.get("vitals")
         
         if not message:
             return jsonify({"error": "Message required"}), 400
             
-        if not gemini_client:
+        gemini_api_key = os.environ.get("GEMINI_API_KEY", "")
+        if not gemini_api_key:
             print("[\033[91mERROR\033[0m] GEMINI_API_KEY is not set in environment!")
             return jsonify({"reply": "AI Assistant is not configured on the server. Please set a valid GEMINI_API_KEY."}), 200
 
         db = get_db()
         context = ""
         readings_list = []
+        patient = {}
         
         if patient_id:
             row = db.execute("SELECT * FROM patients WHERE id = ?", (patient_id,)).fetchone()
+            if not row:
+                row = db.execute(
+                    "SELECT p.* FROM patients p JOIN users u ON u.patient_link_id = p.id WHERE u.id = ? OR u.patient_link_id = ?",
+                    (patient_id, patient_id)
+                ).fetchone()
+
             if row:
                 patient = dict(row)
                 vitals = db.execute(
                     "SELECT * FROM vitals WHERE patient_id = ? ORDER BY timestamp ASC LIMIT 50",
-                    (patient_id,)
+                    (patient['id'],)
                 ).fetchall()
                 
-                context += f"Patient Profile:\nAge: {patient['age']}, Gender: {patient['gender']}, BMI: {patient.get('bmi', 'N/A')}, Comorbidities: {patient['comorbidities'] or 'None'}\n\n"
+                context += f"Patient Profile:\nName: {patient.get('name', 'N/A')}, Age: {patient['age']}, Gender: {patient['gender']}, BMI: {patient.get('bmi', 'N/A')}, Comorbidities: {patient['comorbidities'] or 'None'}\n\n"
                 
                 readings_list = [
                     {"heartRate": v["heart_rate"], "spO2": v["spo2"],
@@ -665,9 +689,32 @@ def chat():
                     for v in vitals
                 ]
             else:
-                context += "Note: Patient context not found for the provided ID.\n\n"
+                context += "Note: Patient profile not found for the provided ID.\n\n"
         else:
             context += "Note: General medical inquiry. No specific patient data provided.\n\n"
+
+        # Ingest live vitals context payload if supplied
+        if vitals_input:
+            if isinstance(vitals_input, list):
+                for item in vitals_input:
+                    if isinstance(item, dict) and ("heartRate" in item or "heart_rate" in item):
+                        readings_list.append({
+                            "heartRate": item.get("heartRate") or item.get("heart_rate"),
+                            "spO2": item.get("spO2") or item.get("spo2"),
+                            "temperature": item.get("temperature", 36.8),
+                            "timestamp": item.get("timestamp", datetime.now().isoformat())
+                        })
+            elif isinstance(vitals_input, dict):
+                hr = vitals_input.get("heartRate") or vitals_input.get("heart_rate")
+                spo2 = vitals_input.get("spO2") or vitals_input.get("spo2")
+                temp = vitals_input.get("temperature")
+                if hr is not None and spo2 is not None:
+                    readings_list.append({
+                        "heartRate": float(hr),
+                        "spO2": float(spo2),
+                        "temperature": float(temp) if temp is not None else 36.8,
+                        "timestamp": datetime.now().isoformat()
+                    })
         
         if readings_list:
             latest = readings_list[-1]
@@ -691,13 +738,15 @@ def chat():
             except Exception as trend_err:
                 print(f"[WARN] Trend/CVD computation failed: {trend_err}")
             
-            latest_db_row = vitals[-1]
-            if latest_db_row['assessment_json']:
-                try:
-                    assessment = json.loads(latest_db_row['assessment_json'])
-                    context += f"- System Prediction: {assessment.get('prediction', 'Unknown')} (Risk: {assessment.get('risk', {}).get('category', 'Unknown')})\n"
-                except:
-                    pass
+            # Check latest DB assessment if available
+            if patient_id and 'vitals' in locals() and vitals:
+                latest_db_row = vitals[-1]
+                if latest_db_row['assessment_json']:
+                    try:
+                        assessment = json.loads(latest_db_row['assessment_json'])
+                        context += f"- System Prediction: {assessment.get('prediction', 'Unknown')} (Risk: {assessment.get('risk', {}).get('category', 'Unknown')})\n"
+                    except:
+                        pass
         else:
             context += "Latest Vitals: None recorded yet.\n"
                     
@@ -711,27 +760,122 @@ def chat():
             "3. NEVER invent or hallucinate missing vital readings or symptoms. "
             "4. Always advise the patient to consult their doctor for medical advice or if symptoms worsen. "
             "5. If the patient describes an emergency (e.g. chest pain, severe shortness of breath), instruct them to call emergency services immediately. "
-            f"Respond in this language: {lang_name}.\n\n"
+            f"Respond clearly and accurately in this language: {lang_name}.\n\n"
             f"=== CONTEXT START ===\n{context}\n=== CONTEXT END ==="
         )
 
-        # Build conversation history for Gemini
-        contents = []
-        for msg in frontend_history:
-            if msg.get("content", "").startswith("Hello! I am your AI Health Assistant"):
+        # Build conversation history for Gemini REST API with strict alternation guarantee
+        raw_turns = []
+        for msg in (frontend_history or []):
+            if not isinstance(msg, dict):
                 continue
-            role = "model" if msg["role"] == "assistant" else "user"
-            contents.append({"role": role, "parts": [{"text": msg["content"]}]})
-        # Add the current user message
-        contents.append({"role": "user", "parts": [{"text": message}]})
-
-        response = gemini_client.models.generate_content(
-            model="gemini-3.6-flash",
-            contents=contents,
-            config={"system_instruction": system_instruction}
-        )
+            content_text = (msg.get("content") or "").strip()
+            if not content_text:
+                continue
+            
+            # Filter out introductory greeting / welcome messages from assistant
+            is_greeting = (
+                "AI Health Assistant" in content_text or
+                "health guidance" in content_text or
+                "स्वास्थ्य सहायक" in content_text or
+                "आरोग्य सहाय्यक" in content_text or
+                "Hello! I am" in content_text or
+                "नमस्ते!" in content_text or
+                "नमस्कार!" in content_text
+            )
+            raw_role = msg.get("role")
+            if is_greeting and raw_role == "assistant":
+                continue
+            
+            role = "model" if raw_role == "assistant" else "user"
+            raw_turns.append((role, content_text))
         
-        return jsonify({"reply": response.text})
+        # Current user message
+        curr_msg_clean = (message or "").strip()
+        if not curr_msg_clean:
+            return jsonify({"reply": "Please type a health question or symptom to discuss."}), 200
+        
+        # If the history already ended with this exact user message, avoid duplicate turn
+        if raw_turns and raw_turns[-1][0] == "user" and raw_turns[-1][1] == curr_msg_clean:
+            pass
+        else:
+            raw_turns.append(("user", curr_msg_clean))
+        
+        # Gemini strictly requires:
+        # 1. First turn MUST be 'user'
+        # 2. Roles MUST strictly alternate (user -> model -> user -> model -> user)
+        # 3. Final turn MUST be 'user'
+        clean_turns = []
+        for role, text in raw_turns:
+            if not clean_turns:
+                if role != "user":
+                    continue  # Skip leading model/assistant messages
+                clean_turns.append((role, text))
+            else:
+                last_role, last_text = clean_turns[-1]
+                if role == last_role:
+                    # Merge consecutive same-role turns to preserve strict alternation
+                    clean_turns[-1] = (last_role, f"{last_text}\n{text}")
+                else:
+                    clean_turns.append((role, text))
+        
+        # Ensure we have at least the current user message
+        if not clean_turns or clean_turns[-1][0] != "user":
+            clean_turns.append(("user", curr_msg_clean))
+            
+        contents = [{"role": r, "parts": [{"text": t}]} for r, t in clean_turns]
+
+        # Generate content via Gemini REST with model fallback
+        payload = {
+            "system_instruction": {
+                "parts": [{"text": system_instruction}]
+            },
+            "contents": contents,
+            "generationConfig": {
+                "temperature": 0.3,
+                "maxOutputTokens": 1024
+            }
+        }
+
+        models_to_try = [
+            "gemini-flash-lite-latest",
+            "gemini-3.5-flash-lite",
+            "gemini-3.1-flash-lite",
+            "gemini-flash-latest"
+        ]
+        reply_text = None
+        attempt_logs = []
+
+        for model_name in models_to_try:
+            try:
+                endpoint = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_api_key}"
+                res = requests.post(endpoint, json=payload, timeout=12)
+                if res.status_code == 200:
+                    res_json = res.json()
+                    candidates = res_json.get("candidates", [])
+                    if candidates and "content" in candidates[0]:
+                        parts = candidates[0]["content"].get("parts", [])
+                        if parts and "text" in parts[0]:
+                            reply_text = parts[0]["text"]
+                            break
+                else:
+                    attempt_logs.append(f"{model_name}: HTTP {res.status_code} - {res.text[:100]}")
+            except Exception as call_err:
+                attempt_logs.append(f"{model_name} exc: {call_err}")
+
+        if reply_text:
+            return jsonify({"reply": reply_text})
+        else:
+            log_summary = " | ".join(attempt_logs)
+            print(f"[WARN] Gemini generation failed: {log_summary}", flush=True)
+            try:
+                with open("gemini_err.log", "w", encoding="utf-8") as f:
+                    f.write(log_summary)
+            except Exception:
+                pass
+            return jsonify({
+                "reply": "I am currently unable to reach the medical intelligence server. Please check your network or try again shortly."
+            }), 200
         
     except Exception as e:
         print("=== FLASK /api/chat CRASH LOG ===")
@@ -760,6 +904,75 @@ def dataset_stats():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+# ── System Settings ──
+
+DEFAULT_SETTINGS = {
+    "language": "en",
+    "notifications": True,
+    "theme": "light"
+}
+
+@app.route("/api/settings", methods=["GET"])
+def get_settings():
+    settings = dict(DEFAULT_SETTINGS)
+    try:
+        db = get_db()
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        """)
+        rows = db.execute("SELECT key, value FROM settings").fetchall()
+        for row in rows:
+            val = row["value"]
+            try:
+                val = json.loads(val)
+            except Exception:
+                pass
+            settings[row["key"]] = val
+    except Exception as e:
+        print(f"Error getting settings: {e}")
+    return jsonify(settings), 200
+
+
+@app.route("/api/settings", methods=["POST"])
+def update_settings():
+    data = request.get_json(silent=True) or {}
+    try:
+        db = get_db()
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS settings (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL
+            )
+        """)
+        for k, v in data.items():
+            db.execute(
+                "INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)",
+                (str(k), json.dumps(v))
+            )
+        db.commit()
+    except Exception as e:
+        print(f"Error updating settings: {e}")
+
+    settings = dict(DEFAULT_SETTINGS)
+    try:
+        db = get_db()
+        rows = db.execute("SELECT key, value FROM settings").fetchall()
+        for row in rows:
+            val = row["value"]
+            try:
+                val = json.loads(val)
+            except Exception:
+                pass
+            settings[row["key"]] = val
+    except Exception:
+        settings.update(data)
+
+    return jsonify(settings), 200
 
 
 if __name__ == "__main__":

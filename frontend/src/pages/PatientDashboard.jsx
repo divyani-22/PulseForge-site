@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
+import { useI18n } from '../context/I18nContext'
 import { api } from '../api'
 import VitalsChart from '../components/VitalsChart'
 import AlertsPanel from '../components/AlertsPanel'
@@ -8,6 +9,7 @@ import { Heart, Wind, Thermometer, FileText, Activity, User, Shield } from 'luci
 
 export default function PatientDashboard() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const [patient, setPatient] = useState(null)
   const [vitals, setVitals] = useState([])
   const [prediction, setPrediction] = useState(null)
@@ -42,14 +44,14 @@ export default function PatientDashboard() {
     }
   }
 
-  if (loading) return <div className="text-center py-20 text-gray-500">Loading your health data...</div>
+  if (loading) return <div className="text-center py-20 text-gray-500">{t('loading', 'Loading your health data...')}</div>
 
   if (!patientId) {
     return (
       <div className="text-center py-20">
         <User className="w-12 h-12 text-gray-300 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-gray-700">No Health Profile Found</h2>
-        <p className="text-gray-500 mt-2">Your patient profile hasn't been set up yet. Contact your doctor.</p>
+        <p className="text-gray-500 mt-2">Your user profile hasn't been set up yet. Contact your doctor.</p>
       </div>
     )
   }
@@ -59,21 +61,21 @@ export default function PatientDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Patient header */}
+      {/* User header */}
       <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 text-sm opacity-80">
-              <Shield className="w-4 h-4" /> My Health Dashboard
+              <Shield className="w-4 h-4" /> {t('patientPortal', 'My Health Dashboard')}
             </div>
-            <h1 className="text-2xl font-bold mt-1">{user.name}</h1>
+            <h1 className="text-2xl font-bold mt-1">User {patientId ? `(${patientId})` : ''}</h1>
             <div className="text-sm opacity-80 mt-0.5">
-              {patient?.age}y {patient?.gender === 'M' ? 'Male' : 'Female'} | BMI: {patient?.bmi} | {patient?.age_group?.replace(/_/g, ' ')}
+              {patient?.age}y {patient?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')} | BMI: {patient?.bmi} | {patient?.age_group?.replace(/_/g, ' ')}
             </div>
           </div>
           <Link to={`/patient/${patientId}/report`}
             className="flex items-center gap-2 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 font-medium transition-colors">
-            <FileText className="w-4 h-4" /> My Health Report
+            <FileText className="w-4 h-4" /> {t('generateReport', 'My Health Report')}
           </Link>
         </div>
       </div>
@@ -82,24 +84,24 @@ export default function PatientDashboard() {
       {latest ? (
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <VitalCard icon={Heart} color="red" label="Heart Rate"
-              value={`${latest.heart_rate}`} unit="BPM"
+            <VitalCard icon={Heart} color="red" label={t('heartRate', 'Heart Rate')}
+              value={`${latest.heart_rate}`} unit={t('bpmUnit', 'BPM')}
               status={latestAssessment?.heart_rate?.status} />
-            <VitalCard icon={Wind} color="blue" label="SpO2"
+            <VitalCard icon={Wind} color="blue" label={t('spo2', 'SpO2')}
               value={`${latest.spo2}`} unit="%"
               status={latestAssessment?.spo2?.status} />
-            <VitalCard icon={Thermometer} color="orange" label="Temperature"
-              value={`${latest.temperature}`} unit="°C"
+            <VitalCard icon={Thermometer} color="orange" label={t('temperature', 'Temperature')}
+              value={`${latest.temperature}`} unit={t('celsiusUnit', '°C')}
               status={latestAssessment?.temperature?.status} />
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-              <div className="text-xs text-gray-500 mb-1">NEWS2 Score</div>
+              <div className="text-xs text-gray-500 mb-1">{t('mewsScore', 'NEWS2 Score')}</div>
               <div className={`text-3xl font-bold ${
                 latest.news2_score >= 7 ? 'text-red-600' :
                 latest.news2_score >= 5 ? 'text-orange-600' :
                 latest.news2_score >= 1 ? 'text-yellow-600' : 'text-green-600'
               }`}>{latest.news2_score}<span className="text-base font-normal text-gray-400">/8</span></div>
               <div className="text-xs text-gray-500 capitalize mt-1">
-                {latestAssessment?.news2?.risk_level} risk
+                {latestAssessment?.news2?.risk_level} {t('riskLevel', 'risk')}
               </div>
             </div>
           </div>
@@ -113,7 +115,7 @@ export default function PatientDashboard() {
             }`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-xs font-medium text-gray-500 uppercase">Current Health Status</div>
+                  <div className="text-xs font-medium text-gray-500 uppercase">{t('clinicalAssessment', 'Current Health Status')}</div>
                   <div className="text-2xl font-bold capitalize mt-1">
                     {prediction.prediction.replace(/_/g, ' ')}
                   </div>
@@ -132,7 +134,7 @@ export default function PatientDashboard() {
           {/* Alerts */}
           {latestAssessment?.alerts?.length > 0 && (
             <div>
-              <h3 className="text-base font-semibold mb-3">Health Alerts</h3>
+              <h3 className="text-base font-semibold mb-3">{t('healthAlerts', 'Health Alerts')}</h3>
               <AlertsPanel alerts={[
                 ...(latestAssessment.alerts || []),
                 ...(trends?.trend_alerts || []),
@@ -143,12 +145,12 @@ export default function PatientDashboard() {
           {/* Trends */}
           {trends && (
             <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
-              <h3 className="text-base font-semibold mb-3">Your Health Trends</h3>
+              <h3 className="text-base font-semibold mb-3">{t('vitalsHistory', 'Your Health Trends')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <TrendBox label="Heart Rate" value={trends.hr_trend} />
-                <TrendBox label="SpO2" value={trends.spo2_trend} />
-                <TrendBox label="Temperature" value={trends.temp_trend} />
-                <TrendBox label="Overall" value={trends.deterioration_trend} />
+                <TrendBox label={t('heartRate', 'Heart Rate')} value={trends.hr_trend} />
+                <TrendBox label={t('spo2', 'SpO2')} value={trends.spo2_trend} />
+                <TrendBox label={t('temperature', 'Temperature')} value={trends.temp_trend} />
+                <TrendBox label={t('riskCategory', 'Overall')} value={trends.deterioration_trend} />
               </div>
             </div>
           )}
