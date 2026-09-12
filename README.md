@@ -1,9 +1,18 @@
 <div align="center">
-  <img src="assets/hero_banner.jpg" alt="Health Monitoring Device Banner" width="100%" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="assets/hero_banner.jpg" alt="PulseForge Banner" width="100%" style="border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
 
-  # 🏥 AI-Powered Smart Health Monitoring System
+  # ⚡ PulseForge — Smart User Monitoring System
   
-  **Real-Time Vitals Telemetry • Multi-Class ML Risk Stratification • Context-Aware Gemini AI Medical Chatbot**
+  **Real-Time Vitals Telemetry • Multi-Class ML Risk Stratification • Context-Aware Gemini AI Assistant**
+
+  <p align="center">
+    <a href="https://pulseforge-divyani22.vercel.app" target="_blank">
+      <img src="https://img.shields.io/badge/🚀_Live_Demo-pulseforge--divyani22.vercel.app-00DC82?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" />
+    </a>
+    <a href="https://frontend-divyani22.vercel.app" target="_blank">
+      <img src="https://img.shields.io/badge/🔗_Mirror-frontend--divyani22.vercel.app-0070F3?style=for-the-badge&logo=vercel&logoColor=white" alt="Mirror Link" />
+    </a>
+  </p>
 
   [![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
   [![Vite](https://img.shields.io/badge/Bundler-Vite_8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -17,7 +26,9 @@
 
 <br />
 
-> 🚀 **The Next Generation of Proactive Healthcare**: An end-to-end intelligent IoT and clinical intelligence platform. It seamlessly ingests continuous physiological telemetry (Heart Rate, SpO2, Temperature), computes early-warning hemodynamic scores (MEWS/NEWS2, Shock Index, MAP), executes real-time multi-class Machine Learning inference across 12 clinical scenarios, and equips patients and clinicians with context-grounded AI guidance powered by Google Gemini.
+> 🌐 **Live Website**: [https://pulseforge-divyani22.vercel.app](https://pulseforge-divyani22.vercel.app) (Alternative: [https://frontend-divyani22.vercel.app](https://frontend-divyani22.vercel.app))
+>
+> 🚀 **The Next Generation of Proactive Healthcare**: PulseForge is an end-to-end intelligent IoT and clinical intelligence platform. It seamlessly ingests continuous physiological telemetry (Heart Rate, SpO2, Temperature), computes early-warning hemodynamic scores (MEWS/NEWS2, Shock Index, MAP), executes real-time multi-class Machine Learning inference across 12 clinical scenarios, and equips users and clinicians with context-grounded AI guidance powered by Google Gemini.
 
 ---
 
@@ -46,18 +57,18 @@
 ## ✨ Key Features
 
 ### 🧑‍⚕️ Doctor Portal
-* **Intelligent Patient Triage:** Unified roster displaying all assigned patients with immediate AI-calculated Risk Levels (Low, Moderate, High, Critical) and NEWS2 scores.
+* **Intelligent User Triage:** Unified roster displaying all assigned users with immediate AI-calculated Risk Levels (Low, Moderate, High, Critical) and NEWS2 scores.
 * **Live Telemetry & Temporal Trends:** Real-time stream visualization with interactive Recharts charting Heart Rate, Blood Oxygen (SpO2), and Temperature over time.
 * **Automated Clinical Diagnostic Reports:** One-click generation of comprehensive medical assessment reports detailing differential diagnosis probabilities, hemodynamic derivations (Shock Index, Mean Arterial Pressure, Rate-Pressure Product), and WHO clinical protocols.
-* **Continuous Monitoring & Telemetry Linking:** Integration with ESP32 devices via patient identification codes and remote Wi-Fi configuration.
+* **Continuous Monitoring & Telemetry Linking:** Integration with ESP32 devices via user identification codes and remote Wi-Fi configuration.
 
-### 🤒 Patient Portal
+### 👤 User Portal
 * **Personalized Health Dashboard:** Clean, intuitive interface displaying live vital metrics, status indicators, and historical recovery/stability trends.
-* **Predictive Early Warning:** Immediate visual feedback when vitals deviate from baseline, empowering patients to seek timely intervention.
+* **Predictive Early Warning:** Immediate visual feedback when vitals deviate from baseline, empowering users to seek timely intervention.
 * **Automated Health Assessment:** Self-service diagnostic summaries explaining current vital stability in plain, reassuring language.
 
-### 🤖 Floating AI Health Assistant
-* **Context-Grounded Medical Intelligence:** Powered by Google Gemini, the chatbot injects the patient's age, BMI, comorbidities, latest vitals, and 24-hour temporal slope directly into the reasoning prompt.
+### 🤖 Context-Aware AI Health Assistant
+* **Context-Grounded Medical Intelligence:** Powered by Google Gemini, the chatbot injects the user's age, BMI, comorbidities, latest vitals, and 24-hour temporal slope directly into the reasoning prompt.
 * **Multilingual Interaction:** Communicates fluidly in **English**, **Hindi (हिंदी)**, and **Marathi (मराठी)** based on user preference.
 * **Clinical Safety Guardrails:** Strict conservative medical prompting prevents hallucinated diagnoses, refuses unauthorized drug prescriptions, and provides immediate emergency triage protocols.
 
