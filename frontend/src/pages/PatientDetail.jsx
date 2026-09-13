@@ -49,7 +49,7 @@ export default function PatientDetail() {
         <div className="flex-1">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             <User className="w-6 h-6 text-blue-600" />
-            User {patient.id ? `(${patient.id})` : ''}
+            {patient.name || `User (${patient.id || id})`}
           </h1>
           <div className="text-sm text-gray-500">
             {patient.age}y {patient.gender === 'M' ? 'Male' : 'Female'} | BMI: {patient.bmi} ({patient.age_group?.replace(/_/g, ' ')})

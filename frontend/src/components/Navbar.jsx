@@ -121,7 +121,7 @@ export default function Navbar() {
                 {user?.role === 'doctor'
                   ? <Stethoscope className="w-4 h-4 text-teal-600" />
                   : <User className="w-4 h-4 text-emerald-600" />}
-                <span className="hidden sm:inline">{user?.role === 'doctor' ? `Dr. ${user?.name || 'Doctor'}` : 'User'}</span>
+                <span className="hidden sm:inline">{user?.role === 'doctor' ? `Dr. ${user?.name || 'Doctor'}` : (user?.name || 'User')}</span>
                 <span className="px-2 py-0.5 bg-teal-50 text-teal-700 rounded-full text-xs capitalize font-medium">
                   {user?.role === 'doctor' ? t('doctor', 'Doctor') : t('patient', 'User')}
                 </span>

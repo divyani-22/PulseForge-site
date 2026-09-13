@@ -158,7 +158,7 @@ export default function Dashboard() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <Link to={`/patient/${p.id}`} className="font-medium text-blue-700 hover:text-blue-800">
-                      User ({p.id})
+                      {p.name || `User (${p.id})`}
                     </Link>
                     {statusBadge(p.latest_vitals)}
                   </div>

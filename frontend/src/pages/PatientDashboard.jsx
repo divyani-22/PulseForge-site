@@ -68,7 +68,9 @@ export default function PatientDashboard() {
             <div className="flex items-center gap-2 text-sm opacity-80">
               <Shield className="w-4 h-4" /> {t('patientPortal', 'My Health Dashboard')}
             </div>
-            <h1 className="text-2xl font-bold mt-1">User {patientId ? `(${patientId})` : ''}</h1>
+            <h1 className="text-2xl font-bold mt-1">
+              {patient?.name || user?.name || (patientId ? `User (${patientId})` : 'User')}
+            </h1>
             <div className="text-sm opacity-80 mt-0.5">
               {patient?.age}y {patient?.gender === 'M' ? t('male', 'Male') : t('female', 'Female')} | BMI: {patient?.bmi} | {patient?.age_group?.replace(/_/g, ' ')}
             </div>

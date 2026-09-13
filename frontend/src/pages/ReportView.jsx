@@ -79,8 +79,8 @@ export default function ReportView() {
           <Shield className="w-5 h-5 text-teal-600" /> User Information
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <Info label="User" value={`User (${patient.id || id})`} />
-          <Info label="User ID" value={patient.id} />
+          <Info label="Name" value={patient.name || `User (${patient.id || id})`} />
+          <Info label="User ID" value={patient.id || id} />
           <Info label="Age" value={`${patient.age}y (${patient.age_group?.replace(/_/g, ' ')})`} />
           <Info label="Gender" value={patient.gender === 'M' ? 'Male' : 'Female'} />
           <Info label="BMI" value={patient.bmi} />
